@@ -1,6 +1,5 @@
 use parity_scale_codec::Encode as _;
 use sp_core::{blake2_256, H256};
-use sp_std::str::FromStr;
 use subxt::{utils::AccountId32, OnlineClient, PolkadotConfig};
 
 #[subxt::subxt(runtime_metadata_url = "wss://polkadot-collectives-rpc.polkadot.io:443")]
@@ -29,93 +28,22 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 			.await?;
 
 	let dispatch_block: u32 = 3_000_000;
-	// dirty hack because I don't know subxt well enough to read all keys
-	let member_accounts: Vec<&'static str> = [
-		"1363HWTPzDrzAQ6ChFiMU6mP4b6jmQid2ae55JQcKtZnpLGv",
-		"16a357f5Sxab3V2ne4emGQvqJaCLeYpTMx3TCjnQhmJQ71DX",
-		"121dd6J26VUnBZ8BqLGjANWkEAXSb9mWq1SB7LsS9QNTGFvz",
-		"1eTPAR2TuqLyidmPT9rMmuycHVm9s9czu78sePqg2KHMDrE",
-		"12hAtDZJGt4of3m2GqZcUCVAjZPALfvPwvtUTFZPQUbdX1Ud",
-		"13dbGnwdBYZPMLGkHj3RZX49Xin9DrLXhyNPQkWSe474XJot",
-		"124GdqpPvjbqWwsRHjJ4UGYAeCUzGHe4NQgRHeTPSfeCN9tN",
-		"1hYiMW8KSfUYChzCQSPGXvMSyKVqmyvMXqohjKr3oU5PCXF",
-		"16SDAKg9N6kKAbhgDyxBXdHEwpwHUHs2CNEiLNGeZV55qHna",
-		"15ydCCiJb3AfbMQkFHikZxVpg2dUWz58Wtf7ScztD8RRkFAN",
-		"15MnsMDx6kavY25y2w2ZUvPgBzzGfV8PRo6Kkmx2vH4wqJE6",
-		"16Q4qkRcWd4r8196dVGNLYVfy7H86MJYJBMockPaMigFXCyv",
-		"12pRzYaysQz6Tr1e78sRmu9FGB8gu8yTek9x6xwVFFAwXTM8",
-		"15akrup6APpRegG1TtWkYVuWHYc37tJ8XPN61vCuHQUi65Mx",
-		"156HGo9setPcU2qhFMVWLkcmtCEGySLwNqa3DaEiYSWtte4Y",
-		"13zbXMsJgQbMkrjai3JUaQmVERZHKLNt42xaGjqJq7mBasDk",
-		"14mDeKZ7qp9hqBjjDg51c8BFrf9o69om8piSSRwj2fT5Yb1i",
-		"15JTWvBx8mSV1xASTnURwi9WzjrJr8YvUwnzhZzG7B2M8MyW",
-		"15DCWHQknBjc5YPFoVj8Pn2KoqrqYywJJ95BYNYJ4Fj3NLqz",
-		"15tdgwSWjLj6oGbuC3KhSctVc9FAAJCcrykN9AZQeCixvkqC",
-		"1ZYq7qWxvqC1rE4PKnTWwoVJYLtn99p9JM9cUn2WqbWr3Jt",
-		"12YzxR5TvGzfMVZNnhAJ5Hwi5zExpRWMKv2MuMwZTrddvgoi",
-		"15DCZocYEM2ThYCAj22QE4QENRvUNVrDtoLBVbCm5x4EQncr",
-		"153FF3AdrgsKmGGWRUbubvYYqFMHZD9bejxHP89FeCZPYZ3z",
-		"1QhVP5qzR2LfXqP77N1JcuwHoY7NH8JVRNFm1hSooE9d4pR",
-		"14YDyDZ9o1Nr2hMqLSbjYpr4Wm5s1gux6CvjYZfUTJ4Np3w1",
-		"1333zsMafds2sKAr8nG3zwXTCHPYv2Nm6CRgakpu6YVGt7nM",
-		"12brenJreRTd6XsBMo3Ptu5VMUUycC53ipDxUy9Mvb4L1s1q",
-		"13xS6fK6MHjApLnjdX7TJYw1niZmiXasSN91bNtiXQjgEtNx",
-		"136Fm42HZTxUAQD1zDxXuzeF8JgijeDfTSkFBWJKxzVAgQ8K",
-		"123SVCkcHnNKyng8EPmaUeay5kKHu1jig99RT21E2cEx5pQF",
-		"12MrP337azmkTdfCUKe5XLnSQrbgEKqqfZ4PQC7CZTJKAWR3",
-		"12HWjfYxi7xt7EvpTxUis7JoNWF7YCqa19JXmuiwizfwJZY2",
-		"1RaxuqWvyd6sdAEiansxmtget47PVcsSR38d9V2uPzKu2vo",
-		"15db5ksZgmhWE9U8MDq4wLKUdFivLVBybztWV8nmaJvv3NU1",
-		"15qE2YAQCs5Y962RHE7RzNjQxU6Pei21nhkkSM9Sojq1hHps",
-		"13fvj4bNfrTo8oW6U8525soRp6vhjAFLum6XBdtqq9yP22E7",
-		"12zsKEDVcHpKEWb99iFt3xrTCQQXZMu477nJQsTBBrof5k2h",
-		"14ShUZUYUR35RBZW6uVVt1zXDxmSQddkeDdXf1JkMA6P721N",
-		"15VsPr7y92ZFAN6zv7ELqC7eeWvJN5GT2kVozRfRuNoEZCsN",
-		"15tRXfXoZXkjScB3Awv8s2saPjaicKYAyL1WZ3JP5kycoG9n",
-		"1682A5hxfiS1Kn1jrUnMYv14T9EuEnsgnBbujGfYbeEbSK3w",
-		"12gMhxHw8QjEwLQvnqsmMVY1z5gFa54vND74aMUbhhwN6mJR",
-		"15K1tpRFoFsGvqYU2358GE4hK85zQeiKcYo1HT9pnaepRs4U",
-		"1ThiBx5DDxFhoD9GY6tz5Fp4Y7Xn1xfLmDddcoFQghDvvjg",
-		"13QdJvnJgfoitjrxESwrCWTaLMN8KvXxufDUucXM6EWGuxqh",
-		"126X27SbhrV19mBFawys3ovkyBS87SGfYwtwa8J2FjHrtbmA",
-		"14reWPxwQfEyy5nqQEuo9xNAL1CPbCK8TvdANzwTEMH4nxfs",
-		"15Sm4Do29Ci2X458Pwv9MJa52aqfQg6t2Qw3QGpEHpCS1SKK",
-		"167Y1SbQrwQVNfkNUXtRkocfzVbaAHYjnZPkZRScWPQ46XDb",
-		"12rhxeaUeeCkGH5pdkbMGFu2jkgLKKVXEMiCtB6VG1GMbkNu",
-		"14DDofWN1JuYK6BTVrCwgqy2AvNr3izFA1BSr9RAdJQPXBbC",
-		"14DsLzVyTUTDMm2eP3czwPbH53KgqnQRp3CJJZS9GR7yxGDP",
-		"14Ak9rrF6RKHHoLLRUYMnzcvvi1t8E1yAMa7tcmiwUfaqzYK",
-		"16aQgRVKfD22NehdzZD2VPoenP2hvx8RS2gUirfk6abiCies",
-		"15G1iXDLgFyfnJ51FKq1ts44TduMyUtekvzQi9my4hgYt2hs",
-		"13jWdKjMNoMnDUxk4JPVxrQTHFJprxqt36ec3X2L4xQoYJZh",
-		"15PCbSw1gdtCG9fp1AdLVEQnovPh7LLYWN9krTDAZYhHirSY",
-		"1A13Vuern2hQMFHFxDP9vngPtfjnpnVyCiXgYpaiTYo8qFb",
-		"13aYUFHB3umoPoxBEAHSv451iR3RpsNi3t5yBZjX2trCtTp6",
-		"14ajTQdrtCA8wZmC4PgD8Y1B2Gy8L4Z3oi2fodxq9FehcFrM",
-		"15oLanodWWweiZJSoDTEBtrX7oGfq6e8ct5y5E6fVRDPhUgj",
-		"16PNhcMEvGbTYdCht9vLy6gj8qehRehEpb2EfmXB7xShZUVX",
-		"13DWAWRTVpkPwWdFDmtUfh73KeCWMiJqEV84xRwpg34EZt8Y",
-		"1eK9SC7Z2QFi4es2aKQHAehcZqY7bEiprkpsT483PvVK8KE",
-		"15zKd25HoSDPHCn1HjuuHTioXLT7PA2pZQ8gYjFsHW4r96qS",
-		"165wJzybiNv9VVUypbNRiK5WPKZABTQ5hCFNr9qTAgNCJR12",
-	]
-	.to_vec();
+	let mut ranked_fellows = Vec::new();
 
-	assert_eq!(member_accounts.len(), 67);
-	let mut ranked_fellows = Vec::with_capacity(member_accounts.len());
+	let fellows = collectives::storage().fellowship_collective().members_iter();
+	let mut member_records = api.storage().at_latest().await?.iter(fellows).await?;
 
-	for member in member_accounts {
-		let account = AccountId32::from_str(member)?;
-		let fellows_query = collectives::storage().fellowship_collective().members(&account);
-		let record = api
-			.storage()
-			.at_latest()
-			.await?
-			.fetch(&fellows_query)
-			.await?
-			.ok_or("Fellowship should have this member")?;
-		ranked_fellows.push((account, record.rank));
+	while let Some(Ok((account, record))) = member_records.next().await {
+		let key_bytes = &account[..];
+		assert_eq!(key_bytes.len(), 72); // 40 byte prefix, 32 byte account id
+		let mut account_id: [u8; 32] = [0; 32];
+		account_id.copy_from_slice(&key_bytes[40..]);
+		let fellow = AccountId32::try_from(account_id)?;
+		ranked_fellows.push((fellow, record.rank));
 	}
+
+	// currently 67 members
+	assert_eq!(ranked_fellows.len(), 67);
 
 	let mut ones: Vec<RuntimeCall> = Vec::new();
 	let mut twos: Vec<RuntimeCall> = Vec::new();
@@ -144,111 +72,57 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
 		}
 	}
 
-	let ones_batch = RuntimeCall::Utility(UtilityCall::force_batch { calls: ones });
-	let ones_encoded = ones_batch.encode();
-	let ones_hash = blake2_256(&ones_encoded);
-	let ones_len: u32 = ones_encoded.len().try_into().unwrap();
-	let ones_preimage = RuntimeCall::Preimage(PreimageCall::note_preimage { bytes: ones_encoded });
-	let ones_referendum = RuntimeCall::FellowshipReferenda(FellowshipReferendaCall::submit {
-		proposal_origin: Box::new(OriginCaller::FellowshipOrigins(FellowshipOrigins::RetainAt1Dan)),
-		proposal: Lookup { hash: H256(ones_hash), len: ones_len },
-		enactment_moment: DispatchTime::At(dispatch_block),
-	});
+	let (ones_preimage, ones_referendum) =
+		generate_calls(ones, FellowshipOrigins::RetainAt1Dan, dispatch_block);
+	let (twos_preimage, twos_referendum) =
+		generate_calls(twos, FellowshipOrigins::RetainAt2Dan, dispatch_block);
+	let (threes_preimage, threes_referendum) =
+		generate_calls(threes, FellowshipOrigins::RetainAt3Dan, dispatch_block);
+	let (fours_preimage, fours_referendum) =
+		generate_calls(fours, FellowshipOrigins::RetainAt4Dan, dispatch_block);
 
-	let twos_batch = RuntimeCall::Utility(UtilityCall::force_batch { calls: twos });
-	let twos_encoded = twos_batch.encode();
-	let twos_hash = blake2_256(&twos_encoded);
-	let twos_len: u32 = twos_encoded.len().try_into().unwrap();
-	let twos_preimage = RuntimeCall::Preimage(PreimageCall::note_preimage { bytes: twos_encoded });
-	let twos_referendum = RuntimeCall::FellowshipReferenda(FellowshipReferendaCall::submit {
-		proposal_origin: Box::new(OriginCaller::FellowshipOrigins(FellowshipOrigins::RetainAt2Dan)),
-		proposal: Lookup { hash: H256(twos_hash), len: twos_len },
-		enactment_moment: DispatchTime::At(dispatch_block),
-	});
-
-	let threes_batch = RuntimeCall::Utility(UtilityCall::force_batch { calls: threes });
-	let threes_encoded = threes_batch.encode();
-	let threes_hash = blake2_256(&threes_encoded);
-	let threes_len: u32 = threes_encoded.len().try_into().unwrap();
-	let threes_preimage =
-		RuntimeCall::Preimage(PreimageCall::note_preimage { bytes: threes_encoded });
-	let threes_referendum = RuntimeCall::FellowshipReferenda(FellowshipReferendaCall::submit {
-		proposal_origin: Box::new(OriginCaller::FellowshipOrigins(FellowshipOrigins::RetainAt3Dan)),
-		proposal: Lookup { hash: H256(threes_hash), len: threes_len },
-		enactment_moment: DispatchTime::At(dispatch_block),
-	});
-
-	let fours_batch = RuntimeCall::Utility(UtilityCall::force_batch { calls: fours });
-	let fours_encoded = fours_batch.encode();
-	let fours_hash = blake2_256(&fours_encoded);
-	let fours_len: u32 = fours_encoded.len().try_into().unwrap();
-	let fours_preimage =
-		RuntimeCall::Preimage(PreimageCall::note_preimage { bytes: fours_encoded });
-	let fours_referendum = RuntimeCall::FellowshipReferenda(FellowshipReferendaCall::submit {
-		proposal_origin: Box::new(OriginCaller::FellowshipOrigins(FellowshipOrigins::RetainAt4Dan)),
-		proposal: Lookup { hash: H256(fours_hash), len: fours_len },
-		enactment_moment: DispatchTime::At(dispatch_block),
-	});
-
-	let host: &'static str = "https://polkadot.js.org/apps/";
-	let rpc: &'static str = "wss%3A%2F%2Fpolkadot-collectives-rpc.polkadot.io";
-	println!("\nAccept all rank 1:");
-	println!(
-		"- [Preimage]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(ones_preimage.encode())
-	);
-	println!(
-		"- [Referendum]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(ones_referendum.encode())
-	);
-
-	println!("\nAccept all rank 2:");
-	println!(
-		"- [Preimage]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(twos_preimage.encode())
-	);
-	println!(
-		"- [Referendum]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(twos_referendum.encode())
-	);
-
-	println!("\nAccept all rank 3:");
-	println!(
-		"- [Preimage]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(threes_preimage.encode())
-	);
-	println!(
-		"- [Referendum]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(threes_referendum.encode())
-	);
-
-	println!("\nAccept all rank 4:");
-	println!(
-		"- [Preimage]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(fours_preimage.encode())
-	);
-	println!(
-		"- [Referendum]({}?rpc={}#/extrinsics/decode/0x{})",
-		host,
-		rpc,
-		hex::encode(fours_referendum.encode())
-	);
+	log(ones_preimage, ones_referendum, 1);
+	log(twos_preimage, twos_referendum, 2);
+	log(threes_preimage, threes_referendum, 3);
+	log(fours_preimage, fours_referendum, 4);
 
 	Ok(())
+}
+
+fn generate_calls(
+	to_accept: Vec<RuntimeCall>,
+	track: FellowshipOrigins,
+	dispatch_block: u32,
+) -> (RuntimeCall, RuntimeCall) {
+	let batch = RuntimeCall::Utility(UtilityCall::force_batch { calls: to_accept });
+	let encoded = batch.encode();
+	let hash = blake2_256(&encoded);
+	let len: u32 = encoded.len().try_into().unwrap();
+	let preimage = RuntimeCall::Preimage(PreimageCall::note_preimage { bytes: encoded });
+	let referendum = RuntimeCall::FellowshipReferenda(FellowshipReferendaCall::submit {
+		proposal_origin: Box::new(OriginCaller::FellowshipOrigins(track)),
+		proposal: Lookup { hash: H256(hash), len: len },
+		enactment_moment: DispatchTime::At(dispatch_block),
+	});
+	(preimage, referendum)
+}
+
+fn log(preimage: RuntimeCall, referendum: RuntimeCall, rank: u16) {
+	let host: &'static str = "https://polkadot.js.org/apps/";
+	let rpc: &'static str = "wss%3A%2F%2Fpolkadot-collectives-rpc.polkadot.io";
+	println!("\n Accept all rank {}", rank);
+	println!(
+		"- [Preimage]({}?rpc={}#/extrinsics/decode/0x{})",
+		host,
+		rpc,
+		hex::encode(preimage.encode())
+	);
+	println!(
+		"- [Referendum]({}?rpc={}#/extrinsics/decode/0x{})",
+		host,
+		rpc,
+		hex::encode(referendum.encode())
+	);
 }
 
 /*

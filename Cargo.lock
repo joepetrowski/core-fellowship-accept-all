@@ -121,7 +121,6 @@ dependencies = [
  "hex",
  "parity-scale-codec",
  "sp-core",
- "sp-std 8.0.0 (git+https://github.com/paritytech/polkadot-sdk?branch=master)",
  "subxt",
  "tokio",
 ]
